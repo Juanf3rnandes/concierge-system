@@ -1,0 +1,91 @@
+version: "3.4"
+services:
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_DB: postgres
+      MYSQL_USER: root
+      MYSQL_PASSWORD: juan102030
+    ports:
+      - "3306:3306"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.4"
+          memory: "0.5GB"
+  app1:
+    image: juanf3rnandes/concierge-system:latest
+    environment:
+      MYSQL_DB: "concierge"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "juan102030"
+      DB_HOST: "localhost"
+      BATCH: "false"
+      CLUSTER: "false"
+      PINO_LOG_LEVEL: "info"
+      REQ_TIMEOUT: "10000"
+    ports:
+      - "8080"
+    depends_on:
+      - mysql
+    deploy:
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: "0.2GB"
+  app2:
+    image: juanf3rnandes/concierge-system:latest
+    environment:
+      MYSQL_DB: "concierge"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "juan102030"
+      DB_HOST: "localhost"
+      BATCH: "false"
+      CLUSTER: "false"
+      PINO_LOG_LEVEL: "info"
+      REQ_TIMEOUT: "10000"
+    ports:
+      - "8080"
+    depends_on:
+      - mysql
+    deploy:
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: "0.2GB"
+  app3:
+    image: juanf3rnandes/concierge-system:latest
+    environment:
+      MYSQL_DB: "concierge"
+      MYSQL_USER: "root"
+      MYSQL_PASSWORD: "juan102030"
+      DB_HOST: "localhost"
+      BATCH: "false"
+      CLUSTER: "false"
+      PINO_LOG_LEVEL: "info"
+      REQ_TIMEOUT: "10000"
+    ports:
+      - "8080"
+    depends_on:
+      - mysql
+    deploy:
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: "0.2GB"
+
+  nginx: # Load Balancer
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app1
+      - app2
+      - app3
+    ports:
+      - "9999:9999"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: "0.5GB"
